@@ -83,16 +83,14 @@ class _HomePageState extends State<HomePage> {
         onMessage: (Map<String, dynamic> message)async{
         //  print("onMessage "+message.toString());//message {notification: {body: text message, title: title message}, data: {}}
           setState(() {
-
             print("onMessage "+message.toString());
             PushNotification ns = PushNotification(title: message['notification']['title'], body: message['notification']['body']);
-            print("PushNotification 1"+ns.toString());
+           // PushNotification ns = PushNotification(title: message['title'], body: message['body']);
+            print("PushNotification 1: "+ns.title);
 
-            DataNotification data = DataNotification(
-                type: message['data']['type'],
-                content: message['data']['content']
-            );
-            print("data 1"+data.toString());
+            //DataNotification data = DataNotification(type: message['data']['type'], content: message['data']['content']);
+            DataNotification data = DataNotification(type: message['type'], content: message['content']);
+            print("data 1: "+data.type);
            // title =message["notification"]["title"];
             title =ns.title;
             content =data.content;
