@@ -1,0 +1,20 @@
+// using postmap test
+// https://fcm.googleapis.com/fcm/send
+// header:
+ - Content-Type: application/json
+ - Authorization: key=AAAAmogMhrc:APA91bEhcmcxxv9-15T-tWydV0ZCSAG4qqNSqX5bWbkdIT8-8HpYIG_TA-ZT1ypMumIOUQBRQJwSk3Phn1NapYdZoTvyyxt9fXcnPelBBTT6HjrFNihmtMFSQaLZHoBtWuqxrHQwiJjf
+ // post method
+  - body
+  {
+   "notification" : {
+   "body" : "Dự báo thời tiết",
+   "title":"Thời sự"
+   },
+   "data" : {
+   "click_action": "FLUTTER_NOTIFICATION_CLICK",
+   "type" : "detail",
+   "content" : "hôm qua trời mưa",
+    "description" : "thì sẽ ko có nắng"
+  },
+  "to":"device token",
+  }
