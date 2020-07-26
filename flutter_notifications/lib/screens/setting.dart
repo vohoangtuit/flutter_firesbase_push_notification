@@ -17,7 +17,8 @@ class _SettingPageState extends State<SettingPage> {
       ),
       body: Center(
         child: Container(
-          child: Text(widget.content, style: TextStyle(fontSize: 18,color: Colors.teal),),
+          color: Colors.cyan,
+          child: Text("Setting: "+widget.content, style: TextStyle(fontSize: 30,color: Colors.white),),
         ),
       ),
 

@@ -7,6 +7,7 @@ class DataNotification{
   DataNotification({this.type, this.content,this.description,this.click_action});
 
   factory DataNotification.fromJson(Map<String,dynamic> json) =>DataNotification(
+
       type:json['data']['type'],
       content:json['data']['content'],
       description:json['data']['description'],

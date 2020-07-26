@@ -17,7 +17,8 @@ centerTitle: true,
       ),
       body: Center(
         child: Container(
-          child: Text(widget.content, style: TextStyle(fontSize: 18,color: Colors.red),),
+          color: Colors.blueGrey,
+          child: Text("Detail: "+widget.content, style: TextStyle(fontSize: 18,color: Colors.white),),
         ),
       ),
 
