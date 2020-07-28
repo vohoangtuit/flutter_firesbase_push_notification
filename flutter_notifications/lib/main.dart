@@ -40,10 +40,25 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    var android = new AndroidInitializationSettings('mipmap/ic_launcher');
-    var ios = new IOSInitializationSettings();
-    var platform = new InitializationSettings(android, ios);
-    flutterLocalNotificationsPlugin.initialize(platform);
+
+    initNotification();
+  }
+  initNotification(){
+    var initializationSettingsAndroid =
+    AndroidInitializationSettings('@mipmap/ic_launcher');
+    var initializationSettingsIOS = IOSInitializationSettings();
+    var initializationSettings = InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: onSelectNotification);
+    _firebaseMessaging.requestNotificationPermissions(
+        const IosNotificationSettings(sound: true, alert: true, badge: true));
+    _firebaseMessaging.onIosSettingsRegistered
+        .listen((IosNotificationSettings setting) {
+      print('IOS Setting Registed');
+    });
+
+
     _firebaseMessaging.configure(
       onLaunch: (Map<String, dynamic> message) async{
         setState(() {
@@ -56,7 +71,7 @@ class _HomePageState extends State<HomePage> {
           }else{
             data = DataNotification.fromJson(message);
           }
-          ResponseNotification responseNotification =  ResponseNotification(pushNotification,data);
+          ResponseNotification responseNotification =  ResponseNotification(notification:pushNotification,dataNotification:data);
           gotoDetailScreen(responseNotification);
         });
       },
@@ -71,7 +86,7 @@ class _HomePageState extends State<HomePage> {
         }else{
           data = DataNotification.fromJson(message);
         }
-        ResponseNotification responseNotification =  ResponseNotification(pushNotification,data);
+        ResponseNotification responseNotification =  ResponseNotification(notification:pushNotification,dataNotification:data);
         gotoDetailScreen(responseNotification);
         setState(() {
           description =data.description;
@@ -84,18 +99,17 @@ class _HomePageState extends State<HomePage> {
           print("onMessage "+message.toString());
           PushNotification pushNotification = PushNotification.fromJson(message);
 
-         // print("PushNotification 1: "+pushNotification.title);
+          // print("PushNotification 1: "+pushNotification.title);
           DataNotification data;
           if(Platform.isIOS){
             data = DataNotification.fromJsonIOS(message);
           }else{
             data = DataNotification.fromJson(message);
           }
-         // print("data 1: "+data.type);
-        //  print("title : $description - content: $content");
-          ResponseNotification responseNotification =  ResponseNotification(pushNotification,data);
-        //  showBannerNewNotify(responseNotification);
-          _showBannerNewNotify(responseNotification);
+
+          ResponseNotification responseNotification =  ResponseNotification(notification:pushNotification,dataNotification:data);
+          //showBannerNewNotify(responseNotification);
+          _showNotification(responseNotification);
 
           description =pushNotification.title;
           content =data.content;
@@ -104,15 +118,8 @@ class _HomePageState extends State<HomePage> {
         });
       },
     );
-    _firebaseMessaging.requestNotificationPermissions(
-        const IosNotificationSettings(sound: true, alert: true, badge: true));
-    _firebaseMessaging.onIosSettingsRegistered
-        .listen((IosNotificationSettings setting) {
-      print('IOS Setting Registed');
-    });
 
     getToken();
-
   }
   Future<String> getToken()async{
     await _firebaseMessaging.getToken().then((value){
@@ -151,8 +158,43 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+  Future _showNotification(ResponseNotification responseNotification) async {/// todo: khi app opening thì sẽ vào đây
+    //print("responseNotification:  "+responseNotification.toJson().toString());
+    DataNotification data = DataNotification.fromResponse(responseNotification);
+    print("data description::::: "+data.description);
+    print("data toJson()::::: "+data.toJson().toString());
 
-   gotoDetailScreen(ResponseNotification responseNotification){
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        'your channel id', 'your channel name', 'your channel description',
+        importance: Importance.Max, priority: Priority.High,autoCancel: true);
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+        5, responseNotification.notification.title, responseNotification.notification.body, platformChannelSpecifics,
+        payload: responseNotification.dataNotification.description);
+  }
+  Future onSelectNotification(String payload) async {//todo: convert model to json rồi gửi qua screen khác, vì ko gửi model dc
+    if (payload != null) {
+      print('notification payload: ' + payload);
+    }
+    await Navigator.pushAndRemoveUntil(context,
+        MaterialPageRoute(builder: (context) => new DetailPage(payload)),ModalRoute.withName('/'));
+  }
+  showBannerNewNotify(ResponseNotification responseNotification)async{
+    var android = new AndroidNotificationDetails(
+      'your channel id', 'your channel name', 'your channel description',
+        importance: Importance.Max,
+       autoCancel: true
+        );
+    var iOS = new IOSNotificationDetails();
+    var platform = new NotificationDetails(android, iOS);
+
+    await flutterLocalNotificationsPlugin.show(
+        0, responseNotification.notification.title, responseNotification.notification.body, platform);
+  }
+  gotoDetailScreen(ResponseNotification responseNotification){
     switch (responseNotification.dataNotification.type) {
       case "detail":
         Navigator.pushAndRemoveUntil(context,
@@ -182,47 +224,7 @@ class _HomePageState extends State<HomePage> {
         break;
     }
   }
-  showBannerNewNotify(ResponseNotification responseNotification)async{
-    var android = new AndroidNotificationDetails(
-      'your channel id', 'your channel name', 'your channel description',
-        importance: Importance.Max,
-        priority: Priority.High);
-    var iOS = new IOSNotificationDetails();
-    var platform = new NotificationDetails(android, iOS);
-
-    await flutterLocalNotificationsPlugin.show(
-        0, responseNotification.notification.title, responseNotification.notification.body, platform);
-  }
-  // todo: other solution
-  _showBannerNewNotify(ResponseNotification responseNotification)async{
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
-//
-    var android = new AndroidInitializationSettings('@mipmap/ic_launcher');
-    var ios = new IOSInitializationSettings();
-    var initSettings = new InitializationSettings(android, ios);
-
-   // flutterLocalNotificationsPlugin.initialize(initSettings, onSelectNotification: onSelectNotification);
-//
-//
-    var android1 = new AndroidNotificationDetails(
-        'channel id', 'channel NAME', 'channel DESCRIPTION',
-        importance: Importance.Max, priority: Priority.High, ticker: 'ticker',
-      ongoing: false,autoCancel: false
-    );
-//
-   var ios1 = new IOSNotificationDetails();
-    var platform = new NotificationDetails(android1, ios1);
-    await flutterLocalNotificationsPlugin
-        .show(0, responseNotification.notification.title, responseNotification.notification.body, platform, payload: responseNotification.notification.toString());
-
-  }
-  Future onSelectNotification(String payload) async {
-    if (payload != null) {
-      print('Notification payload: $payload');
-    }
-    await Navigator.pushAndRemoveUntil(context,
-         MaterialPageRoute(builder: (context) => new DetailPage('iiu')),ModalRoute.withName('/'));
-  }
+// https://stackoverflow.com/questions/60124063/is-it-possible-to-pass-parameter-on-onselectnotification-for-flutter-local-notif
 // todo: https://github.com/JohannesMilke/local_push_notification_ii
   // todo: tham khảo: https://medium.com/@nitishk72/flutter-local-notification-1e43a353877b
 // todo: https://github.com/turcuciprian/coding_with_cip_video_apps/tree/master/flutter_local_notifications_example

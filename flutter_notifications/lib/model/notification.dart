@@ -6,7 +6,6 @@ class PushNotification{
   factory PushNotification.fromJson(Map<String, dynamic> json)=> PushNotification(
     title: json['notification']['title'],
     body: json['notification']['body']
-
   );
 
 }
