@@ -12,9 +12,28 @@ import 'package:flutter_notifications/screens/splash.dart';
 
 import 'my_router.dart';
 
-void main() {
-  runApp(MyApp());
+//void main() {
+//  runApp(MyApp());
+//}
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await firebaseInit();
+  runApp(
+     MyApp());
+
 }
+Future<void> firebaseInit() async {
+  if (Platform.isIOS) await _firebaseMessaging.requestNotificationPermissions();
+  await _firebaseMessaging.subscribeToTopic('newJobs');
+}
+//Future<void> init() async {
+//  WidgetsFlutterBinding.ensureInitialized();
+//  await _firebaseMessaging.requestNotificationPermissions();
+// //// final token = await firebaseMessaging.getToken();
+////  print(token);
+//  await _firebaseMessaging.subscribeToTopic("topics-all");
+//}
+FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 class MyApp extends StatelessWidget {
 
   @override
@@ -37,7 +56,7 @@ class MyApp extends StatelessWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =  FlutterLocalNotificationsPlugin();
   String description ="";
   String content ="";
