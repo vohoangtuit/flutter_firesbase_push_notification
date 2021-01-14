@@ -6,37 +6,17 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_notifications/model/data.dart';
 import 'package:flutter_notifications/model/notification.dart';
 import 'package:flutter_notifications/model/response_notification.dart';
-import 'package:flutter_notifications/screens/detail.dart';
 import 'package:flutter_notifications/screens/setting.dart';
-import 'package:flutter_notifications/screens/splash.dart';
 
-import 'my_router.dart';
+import '../my_router.dart';
+import 'detail.dart';
 
-void main() {
-  runApp(MyApp());
-}
-class MyApp extends StatelessWidget {
-
+class HomeScreen extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Notifications',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-     onGenerateRoute: MyRouter.generateRoute,
-      //home: HomePage(),
-      home: SplashScreen(),
-    );
-  }
-}class HomePage extends StatefulWidget {
-  @override
-  _HomePageState createState() => _HomePageState();
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomeScreenState extends State<HomeScreen> {
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =  FlutterLocalNotificationsPlugin();
   String description ="";
@@ -45,7 +25,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
     initNotification();
   }
   initNotification(){
@@ -138,7 +117,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: (Text('Firebase Notification')),
+        title: (Text('Firebase Notification HOME')),
         centerTitle: true,
       ),
       body: Center(
@@ -156,6 +135,18 @@ class _HomePageState extends State<HomePage> {
             ),
             SizedBox(height: 30,),
             Text("totken: "+token,style: TextStyle(color: Colors.black, fontSize: 14),),
+
+            SizedBox(height: 30,),
+            InkWell(child: Text('godo detail'),onTap: (){
+              gotoDetail('Ahihihiih');
+
+            },),
+
+            SizedBox(height: 30,),
+            InkWell(child: Text('godo setting'),onTap: (){
+              Navigator.push(context, MaterialPageRoute(builder: (content)=>SettingPage('content')));
+
+            },)
           ],
         ),
       ),
@@ -170,12 +161,6 @@ class _HomePageState extends State<HomePage> {
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'your channel id', 'your channel name', 'your channel description',
         importance: Importance.Max, priority: Priority.High,autoCancel: true);
-    // var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-    //   id,
-    //   'Reminder notifications',
-    //   'Remember about it',
-    //   icon: 'smile_icon',
-    // );
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
@@ -188,15 +173,29 @@ class _HomePageState extends State<HomePage> {
     if (payload != null) {
       print('notification payload:::::: ' + payload);
     }
-    await Navigator.pushAndRemoveUntil(context,
-        MaterialPageRoute(builder: (context) => new DetailPage(payload)),ModalRoute.withName('/'));
+    // await Navigator.pushAndRemoveUntil(context,
+    //     MaterialPageRoute(builder: (context) => new DetailPage(payload)),ModalRoute.withName('/'));
+    gotoDetail(payload);
+  }
+  gotoDetail(String titile){
+    var route =ModalRoute.of(context).settings.name;
+    print('route: $route');
+    if(Navigator.canPop(context)){
+      print('can pop');
+      Navigator.popUntil(context,
+        ModalRoute.withName(TAG_HOME_SCREEN),
+      );
+    }else{
+      print(' can not pop');
+    }
+    Navigator.pushNamed(context, TAG_DETAIL_SCREEN,arguments: 'asaadwdedwe');
   }
   showBannerNewNotify(ResponseNotification responseNotification)async{
     var android = new AndroidNotificationDetails(
-      'your channel id', 'your channel name', 'your channel description',
+        'your channel id', 'your channel name', 'your channel description',
         importance: Importance.Max,
-       autoCancel: true
-        );
+        autoCancel: true
+    );
     var iOS = new IOSNotificationDetails();
     var platform = new NotificationDetails(android, iOS);
 
@@ -205,17 +204,13 @@ class _HomePageState extends State<HomePage> {
   }
   gotoDetailScreen(ResponseNotification responseNotification){
     switch (responseNotification.dataNotification.type) {
+      // todo https://www.developerlibs.com/2018/09/flutter-push-and-pop-navigation.html
       case "detail":
-        Navigator.pushAndRemoveUntil(context,
-          MaterialPageRoute(builder: (BuildContext context) => DetailPage(responseNotification.dataNotification.description)),
-          ModalRoute.withName('/'),
-        );
-//        Navigator.pushReplacement(
-//            context,
-//            MaterialPageRoute(
-//                builder: (context) => DetailPage(dataNotification.content)
-//            ),
-//        );
+        // Navigator.pushAndRemoveUntil(context,
+        //   MaterialPageRoute(builder: (BuildContext context) => DetailPage(responseNotification.dataNotification.description)),
+        //   ModalRoute.withName(TAG_HOME_SCREEN),
+        // );
+        gotoDetail(responseNotification.dataNotification.description);
         break;
       case "setting":
         Navigator.pushAndRemoveUntil(context,
@@ -235,8 +230,7 @@ class _HomePageState extends State<HomePage> {
   }
 // https://stackoverflow.com/questions/60124063/is-it-possible-to-pass-parameter-on-onselectnotification-for-flutter-local-notif
 // todo: https://github.com/JohannesMilke/local_push_notification_ii
-  // todo: tham khảo: https://medium.com/@nitishk72/flutter-local-notification-1e43a353877b
+// todo: tham khảo: https://medium.com/@nitishk72/flutter-local-notification-1e43a353877b
 // todo: https://github.com/turcuciprian/coding_with_cip_video_apps/tree/master/flutter_local_notifications_example
 }
-
 
