@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
     AndroidInitializationSettings('@mipmap/ic_launcher');
     var initializationSettingsIOS = IOSInitializationSettings();
     var initializationSettings = InitializationSettings(
-        initializationSettingsAndroid, initializationSettingsIOS);
+        android:initializationSettingsAndroid, iOS:initializationSettingsIOS);
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onSelectNotification: onSelectNotification);
     _firebaseMessaging.requestNotificationPermissions(
@@ -160,13 +160,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'your channel id', 'your channel name', 'your channel description',
-        importance: Importance.Max, priority: Priority.High,autoCancel: true);
+        importance: Importance.max, priority: Priority.high,autoCancel: true,enableLights: true,
+        // ledColor: const Color.fromARGB(255, 255, 0, 0),
+        // ledOnMs: 1000,
+        // ledOffMs: 500,
+         sound: RawResourceAndroidNotificationSound('sound_notification'),
+        // playSound: true,
+        // showWhen: true,
+        // enableVibration: true
+    );
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
-        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+        android:androidPlatformChannelSpecifics, iOS:iOSPlatformChannelSpecifics);
 
     await flutterLocalNotificationsPlugin.show(
-        5, responseNotification.notification.title, responseNotification.notification.body, platformChannelSpecifics,
+        0, responseNotification.notification.title, responseNotification.notification.body, platformChannelSpecifics,
         payload: responseNotification.dataNotification.description);
   }
   Future onSelectNotification(String payload) async {//todo: convert model to json rồi gửi qua screen khác, vì ko gửi model dc
@@ -193,11 +201,11 @@ class _HomeScreenState extends State<HomeScreen> {
   showBannerNewNotify(ResponseNotification responseNotification)async{
     var android = new AndroidNotificationDetails(
         'your channel id', 'your channel name', 'your channel description',
-        importance: Importance.Max,
+        importance: Importance.max,
         autoCancel: true
     );
     var iOS = new IOSNotificationDetails();
-    var platform = new NotificationDetails(android, iOS);
+    var platform = new NotificationDetails(android:android, iOS:iOS);
 
     await flutterLocalNotificationsPlugin.show(
         0, responseNotification.notification.title, responseNotification.notification.body, platform);

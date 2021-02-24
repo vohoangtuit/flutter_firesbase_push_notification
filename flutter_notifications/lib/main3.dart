@@ -23,7 +23,7 @@ class _MyAppState extends State<MyApp> {
 
     var android = new AndroidInitializationSettings('mipmap/ic_launcher');
     var ios = new IOSInitializationSettings();
-    var platform = new InitializationSettings(android, ios);
+    var platform = new InitializationSettings(android:android, iOS:ios);
     flutterLocalNotificationsPlugin.initialize(platform);
 
     firebaseMessaging.configure(
@@ -56,7 +56,7 @@ class _MyAppState extends State<MyApp> {
       "channelDescription",
     );
     var iOS = new IOSNotificationDetails();
-    var platform = new NotificationDetails(android, iOS);
+    var platform = new NotificationDetails(android:android, iOS:iOS);
     await flutterLocalNotificationsPlugin.show(
         3, "This is title", "this is demo", platform);
   }

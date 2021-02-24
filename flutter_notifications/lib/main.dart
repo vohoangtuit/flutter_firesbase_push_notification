@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
     AndroidInitializationSettings('@mipmap/ic_launcher');
     var initializationSettingsIOS = IOSInitializationSettings();
     var initializationSettings = InitializationSettings(
-        initializationSettingsAndroid, initializationSettingsIOS);
+        android:initializationSettingsAndroid, iOS:initializationSettingsIOS);
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onSelectNotification: onSelectNotification);
     _firebaseMessaging.requestNotificationPermissions(
@@ -188,7 +188,7 @@ class _HomePageState extends State<HomePage> {
 
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'your channel id', 'your channel name', 'your channel description',
-        importance: Importance.Max, priority: Priority.High,autoCancel: true);
+        importance: Importance.max, priority: Priority.high,autoCancel: true);
     // var androidPlatformChannelSpecifics = AndroidNotificationDetails(
     //   id,
     //   'Reminder notifications',
@@ -197,7 +197,7 @@ class _HomePageState extends State<HomePage> {
     // );
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
-        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+        android:androidPlatformChannelSpecifics, iOS:iOSPlatformChannelSpecifics);
 
     await flutterLocalNotificationsPlugin.show(
         5, responseNotification.notification.title, responseNotification.notification.body, platformChannelSpecifics,
@@ -213,11 +213,11 @@ class _HomePageState extends State<HomePage> {
   showBannerNewNotify(ResponseNotification responseNotification)async{
     var android = new AndroidNotificationDetails(
       'your channel id', 'your channel name', 'your channel description',
-        importance: Importance.Max,
+        importance: Importance.max,
        autoCancel: true
         );
     var iOS = new IOSNotificationDetails();
-    var platform = new NotificationDetails(android, iOS);
+    var platform = new NotificationDetails(android:android, iOS:iOS);
 
     await flutterLocalNotificationsPlugin.show(
         0, responseNotification.notification.title, responseNotification.notification.body, platform);
