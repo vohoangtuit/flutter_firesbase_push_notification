@@ -18,4 +18,21 @@
   },
   "to":"device token",
   }
-
+///////////////////////////////////
+// lỗi build ios :https://stackoverflow.com/questions/61823044/flutter-the-ios-simulator-deployment-target-iphoneos-deployment-target-is-se
+-  add again file GooglePlay-service.info
+- trong file Podfile
+platform :ios, '9.0'
+pod 'Firebase/Analytics'
+....
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '9.0'
+    end
+  end
+end
+- Open Xcode
+  Change Project Document -> Project format -> Xcode 8.0-Compatible
+https://stackoverflow.com/questions/61823044/flutter-the-ios-simulator-deployment-target-iphoneos-deployment-target-is-se
