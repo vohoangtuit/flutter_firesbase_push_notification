@@ -1,0 +1,45 @@
+{
+	"info": {
+		"_postman_id": "023376de-9bd2-4019-a885-c7d1781aa5bf",
+		"name": "notitication",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "https://fcm.googleapis.com/fcm/send",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "key=AAAAeVA1tiQ:APA91bGYMEyG_Vj8lgEQbyrzS0lx2YKLlXMHrjPA8B7K6TmnvKXgC_gNKAIu9Hkw6tWqFCg-LAFlvsUExh35QAUiPeIUZXcgNSzzf2d5qooI9owRL0UvEhi87EGNIygMvZ0lL146g8pN",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"notification\" : {\n   \"body\" : \"Vietravel\",\n   \"title\":\"Tim tức\"\n   },\n   \"data\" : {\n           \"click_action\": \"FLUTTER_NOTIFICATION_CLICK\",\n            \"type_id\" : 1,\n            \"content\" : \"noidung\",\n            \"description\" : \"description\"\n  },\n  \"to\":\" eMWL156WQHCgzMBauhks6J:APA91bEj3joDWHqqhl-kyfg4tUbuXYz8QpbNeElDZfGN3tRRCs4YzpYGAm2jrnRx9zSuBOKBh45XiH-3X0dreoKWyJSH0DwzwFEMHp5XjWQJskpl9FzFc3ff67VBQRLbRBl7UWFkTAal\"\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fcm.googleapis.com/fcm/send",
+					"protocol": "https",
+					"host": [
+						"fcm",
+						"googleapis",
+						"com"
+					],
+					"path": [
+						"fcm",
+						"send"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
