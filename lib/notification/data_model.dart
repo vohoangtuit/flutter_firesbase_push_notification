@@ -34,13 +34,13 @@ class DataNotifyModel{
   }
 
   factory DataNotifyModel.fromRemoteMessage(RemoteMessage remoteMessage) =>DataNotifyModel(
-      type_id:remoteMessage.data[NOTIFY_TYPE_ID],
-      message:remoteMessage.data[NOTIFY_MESSAGE],
-      title:remoteMessage.data[NOTIFY_TITLE],
-      content:remoteMessage.data['content'],
-      notification_id:remoteMessage.data[NOTIFY_NOTIFICATION_ID],
-      object_id:remoteMessage.data[NOTIFY_OBJECT_ID],
-      click_action:remoteMessage.data[NOTIFY_CLICK_ACTION]
+      type_id:remoteMessage.data[NOTIFY_TYPE_ID]??'',
+      message:remoteMessage.data[NOTIFY_MESSAGE]??'',
+      title:remoteMessage.data[NOTIFY_TITLE]??'',
+      content:remoteMessage.data['content']??'',
+      notification_id:remoteMessage.data[NOTIFY_NOTIFICATION_ID]??'',
+      object_id:remoteMessage.data[NOTIFY_OBJECT_ID]??'',
+      click_action:remoteMessage.data[NOTIFY_CLICK_ACTION]??''
   );
   factory DataNotifyModel.fromJsonAndroid(Map<String,dynamic> json) =>DataNotifyModel(
       type_id:json[NOTIFY_DATA][NOTIFY_TYPE_ID],

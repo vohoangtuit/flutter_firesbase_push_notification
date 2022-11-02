@@ -1,9 +1,9 @@
 
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_notifications/screens/detail.dart';
@@ -22,7 +22,7 @@ class NotificationController{
     _firebaseMessaging = FirebaseMessaging.instance;
     _flutterLocalNotificationsPlugin =  FlutterLocalNotificationsPlugin();
    initFirebaseMessage();
-   initLocalNotification();
+    initLocalNotification();
    // deviceToken();
   }
   Future<String?> deviceToken()async{
@@ -68,50 +68,86 @@ class NotificationController{
 
     });
   }
-  initLocalNotification() {
+ initLocalNotification() async{
 
     var initializationSettingsAndroid = AndroidInitializationSettings(
         '@drawable/ic_notification');
 
-    var initializationSettingsIOS = IOSInitializationSettings(requestSoundPermission: true,
+    var initializationSettingsIOS = DarwinInitializationSettings(
+      requestSoundPermission: true,
       requestBadgePermission: true,
       requestAlertPermission: true,);
+    final LinuxInitializationSettings initializationSettingsLinux =
+    LinuxInitializationSettings(
+      defaultActionName: 'Open notification',
+      defaultIcon: AssetsLinuxIcon('icons/app_icon.png'),
+    );
     var initializationSettings = InitializationSettings(
-        android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
-    _flutterLocalNotificationsPlugin.initialize(initializationSettings,onSelectNotification: onSelectNotification);
+        android: initializationSettingsAndroid, iOS: initializationSettingsIOS,macOS: initializationSettingsIOS,linux: initializationSettingsLinux);
+    _flutterLocalNotificationsPlugin.initialize(initializationSettings,onDidReceiveNotificationResponse: onSelectNotification_
+    // _flutterLocalNotificationsPlugin.initialize(initializationSettings,onDidReceiveNotificationResponse:
+    //     (NotificationResponse notificationResponse) {
+    //   switch (notificationResponse.notificationResponseType) {
+    //     case NotificationResponseType.selectedNotification:
+    //       //selectNotificationStream.add(notificationResponse.payload);
+    //     print('NotificationResponseType.selectedNotification ${notificationResponse.payload}');
+    //       break;
+    //     case NotificationResponseType.selectedNotificationAction:
+    //      // if (notificationResponse.actionId == navigationActionId) {
+    //      //   selectNotificationStream.add(notificationResponse.payload);
+    //      // }
+    //       print('NotificationResponseType.selectedNotificationAction ${notificationResponse.payload}');
+    //       break;
+    //   }
+    // },
+    //   onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
+    );
   }
 
+
   void display(RemoteMessage message)async{
-    print('message $message');
+    print('message display ${message.data.toString()}');
     try{
-      final int id = 0;
+      final int id = 100;
+      //final int id = DateTime.now().microsecond ~/100000;
       final NotificationDetails notificationDetails = NotificationDetails(
         android:  AndroidNotificationDetails('vietravel_channel', 'vietravel_channel',
             importance: Importance.max,
             priority:  Priority.high,
             playSound: true,
-            showWhen: true,
+           showWhen: true,
             sound: RawResourceAndroidNotificationSound('sound_notification'),
            // sound: RawResourceAndroidNotificationSound('@raw/sound_notification'),
-            enableLights: true,
-            color: const Color.fromARGB(255, 255, 0, 0),
-            ledColor: const Color.fromARGB(255, 255, 0, 0),
-            ledOnMs: 1000,
-            ledOffMs: 500,
-            autoCancel: true),
-        iOS: IOSNotificationDetails(),
+           enableLights: true,
+           color: const Color.fromARGB(255, 255, 0, 0),
+           ledColor: const Color.fromARGB(255, 255, 0, 0),
+           ledOnMs: 1000,
+           ledOffMs: 500,
+           autoCancel: true
+        ),
+        iOS: DarwinNotificationDetails(presentBadge: true),
       );
       DataNotifyModel data =DataNotifyModel.fromRemoteMessage(message);
+      print('data ${data.toString()}');
       await _flutterLocalNotificationsPlugin.show(0, message.notification!.title, message.notification!.body, notificationDetails,payload: data.toString());
+      //await _flutterLocalNotificationsPlugin.show(1,' message.notification!.title', 'message.notification!.body', notificationDetails,payload: 'data.toString()');
     }on Exception catch(e){
       print('Error Notification $e');
     }
 
   }
   Future onSelectNotification(dynamic payload) async {
+    print('onSelectNotification ${payload.toString()}');
     if (payload != null) {
-    //  print('notification payload:::::: ${payload.toString()}' );
+      print('notification payload:::::: ${payload.toString()}' );
       await  handlePayload(payload);
+    }
+  }
+  Future onSelectNotification_(NotificationResponse payload) async {
+    print('onSelectNotification ${payload.payload}');
+    if (payload != null) {
+      print('notification payload:::::: ${payload.payload}' );
+      await  handlePayload(payload.payload.toString());
     }
   }
   handlePayload(String payload) async {
