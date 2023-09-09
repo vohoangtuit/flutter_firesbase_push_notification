@@ -5,11 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_notifications/model/data.dart';
-import 'package:flutter_notifications/model/notification.dart';
-import 'package:flutter_notifications/model/response_notification.dart';
-import 'package:flutter_notifications/screens/detail.dart';
-import 'package:flutter_notifications/screens/setting.dart';
+
 import 'package:flutter_notifications/screens/splash.dart';
 
 import 'my_router.dart';

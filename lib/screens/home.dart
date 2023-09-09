@@ -29,7 +29,9 @@ class _HomeScreenState extends State<HomeScreen> {
     initNotification();
   }
   initNotification()async{
-    notificationController =NotificationController.getInstance(context: context);
+   // notificationController =NotificationController.getInstance(context: context);
+    notificationController =NotificationController(context: context);
+    notificationController.intiSetup();
      await notificationController.deviceToken().then((value) {
         setState(() {
           token =value;

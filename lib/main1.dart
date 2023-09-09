@@ -2444,7 +2444,7 @@ class _HomePageState extends State<HomePage> {
                     child: const Text('Get messaging style'),
                     onPressed: () {
                       _getActiveNotificationMessagingStyle(
-                          activeNotification.id, activeNotification.tag);
+                          activeNotification.id!, activeNotification.tag);
                     },
                   ),
                   const Divider(color: Colors.black),
@@ -2699,9 +2699,10 @@ Future<void> _showLinuxNotificationWithByteDataIcon() async {
   final ByteData assetIcon = await rootBundle.load(
     'icons/app_icon_density.png',
   );
-  final image.Image? iconData = image.decodePng(
-    assetIcon.buffer.asUint8List().toList(),
-  );
+  final image.Image? iconData =null;
+  // final image.Image? iconData = image.decodePng(
+  //   assetIcon.buffer.asUint8List().toList(),
+  // );
   final Uint8List iconBytes = iconData!.getBytes();
   final LinuxNotificationDetails linuxPlatformChannelSpecifics =
   LinuxNotificationDetails(
@@ -2709,7 +2710,7 @@ Future<void> _showLinuxNotificationWithByteDataIcon() async {
       LinuxRawIconData(
         data: iconBytes,
         width: iconData.width,
-        height: iconData.height,
+       height: iconData.height,
         channels: 4, // The icon has an alpha channel
         hasAlpha: true,
       ),

@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_notifications/screens/detail.dart';
@@ -17,13 +18,20 @@ class NotificationController{
 
   late FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
    BuildContext? context;
-  NotificationController.getInstance({BuildContext? context}){
-    this.context =context;
+  // NotificationController.getInstance({BuildContext? context}){
+  //   this.context =context;
+  //   _firebaseMessaging = FirebaseMessaging.instance;
+  //   _flutterLocalNotificationsPlugin =  FlutterLocalNotificationsPlugin();
+  //  initFirebaseMessage();
+  //   initLocalNotification();
+  //  // deviceToken();
+  // }
+  NotificationController({required this.context});
+  intiSetup() async {
     _firebaseMessaging = FirebaseMessaging.instance;
-    _flutterLocalNotificationsPlugin =  FlutterLocalNotificationsPlugin();
-   initFirebaseMessage();
-    initLocalNotification();
-   // deviceToken();
+    _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    _handleFirebaseMessage();
+    _setupLocalNotification();
   }
   Future<String?> deviceToken()async{
     String? token ='';
@@ -34,74 +42,88 @@ class NotificationController{
     return token;
   }
 
-  initFirebaseMessage()async{
-    if (Platform.isIOS) {
-      await _firebaseMessaging.requestPermission();
-    }
-    // todo gives you the message on which user tap
-    FirebaseMessaging.instance.getInitialMessage().then((message) {
-      if(message!=null){
-        print('getInitialMessage: ${message.data}');
+  _handleFirebaseMessage()async{
+// todo 1: when app killed and user click notification
+    FirebaseMessaging.instance.getInitialMessage().then((message) async{
+      if (message != null) {
+        if (kDebugMode) {
+          print('open app  getInitialMessage: ${message.data}');
+        }
         // todo open screen
-      }
-    });
-    // todo app opening
-    FirebaseMessaging.onMessage.listen((message) {
-      if(message!=null){
-        print('opening message : ${message.notification!.body}');
-        print('opening message: ${message.notification!.title}');
-      //  print(message.data);
-        display(message);
+        _getDataDetail(message);
+        //    if(Device.get().isAndroid){// todo android duplicate
+        //      addCount();
+        //      if(count==1){
+        //        _getDataDetail(message);
+        //        resetCount();
+        //      }
+        //    }else{
+        //      _getDataDetail(message);
+        //    }
       }
     });
 
-    // todo when the app is in background but opened and user taps
-    FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      print('onMessageOpenedApp: ${message.data}');
-      print('message ${message.data['message']}');
-      print('type_id ${message.data['type_id']}');
+    // todo 2: when the app running in background but  and user tap
+    FirebaseMessaging.onMessageOpenedApp.listen((message) async{
+      if (kDebugMode) {
+        print('App running in background onMessageOpenedApp: ${message.data}');
+      }
       // todo open screen
-      if(message!=null){
-        DataNotifyModel data =DataNotifyModel.fromRemoteMessage(message);
-         gotoDetailScreen(data);
-      }
+      _getDataDetail(message);
+      // if(Device.get().isAndroid){
+      //   addCount();
+      //   if(count==1){
+      //     _getDataDetail(message);
+      //     resetCount();
+      //   }
+      // }else{ // todo: ios same todo 1, duplicate
+      //   // _getDataDetail(message);
+      //   // resetCount();
+      // }
 
+    });
+
+    // todo 3: when app opening
+    FirebaseMessaging.onMessage.listen((message) async{
+      if (message.notification != null) {
+        if (kDebugMode) {
+          print('App opening message : ${message.data}');
+        }
+        display(message);
+        // if(Device.get().isAndroid){
+        //   addCount();
+        //   if(count==1){
+        //     selectNotificationSubject.add(message.data.toString());
+        //     display(message);
+        //     resetCount();
+        //   }
+        // }else{
+        //
+        // }
+
+      }
     });
   }
- initLocalNotification() async{
+ _setupLocalNotification() async{
 
-    var initializationSettingsAndroid = AndroidInitializationSettings(
-        '@drawable/ic_notification');
+   await Future.delayed(const Duration(seconds: 6), () {
+     var initializationSettingsAndroid =
+     const AndroidInitializationSettings('@drawable/ic_notification');
 
-    var initializationSettingsIOS = DarwinInitializationSettings(
-      requestSoundPermission: true,
-      requestBadgePermission: true,
-      requestAlertPermission: true,);
-    final LinuxInitializationSettings initializationSettingsLinux =
-    LinuxInitializationSettings(
-      defaultActionName: 'Open notification',
-      defaultIcon: AssetsLinuxIcon('icons/app_icon.png'),
-    );
-    var initializationSettings = InitializationSettings(
-        android: initializationSettingsAndroid, iOS: initializationSettingsIOS,macOS: initializationSettingsIOS,linux: initializationSettingsLinux);
-    _flutterLocalNotificationsPlugin.initialize(initializationSettings,onDidReceiveNotificationResponse: onSelectNotification_
-    // _flutterLocalNotificationsPlugin.initialize(initializationSettings,onDidReceiveNotificationResponse:
-    //     (NotificationResponse notificationResponse) {
-    //   switch (notificationResponse.notificationResponseType) {
-    //     case NotificationResponseType.selectedNotification:
-    //       //selectNotificationStream.add(notificationResponse.payload);
-    //     print('NotificationResponseType.selectedNotification ${notificationResponse.payload}');
-    //       break;
-    //     case NotificationResponseType.selectedNotificationAction:
-    //      // if (notificationResponse.actionId == navigationActionId) {
-    //      //   selectNotificationStream.add(notificationResponse.payload);
-    //      // }
-    //       print('NotificationResponseType.selectedNotificationAction ${notificationResponse.payload}');
-    //       break;
-    //   }
-    // },
-    //   onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
-    );
+     var initializationSettingsIOS =
+     const DarwinInitializationSettings(
+       requestAlertPermission: true,
+       requestBadgePermission: true,
+       requestSoundPermission: true,
+     );
+
+     var initializationSettings = InitializationSettings(
+         android: initializationSettingsAndroid,
+         iOS: initializationSettingsIOS,
+         macOS: initializationSettingsIOS);
+     // _flutterLocalNotificationsPlugin!.initialize(initializationSettings, onDidReceiveNotificationResponse: _onDidReceiveNotificationResponse);
+     _flutterLocalNotificationsPlugin.initialize(initializationSettings, onDidReceiveNotificationResponse: _onSelectNotification);
+   });
   }
 
 
@@ -136,23 +158,35 @@ class NotificationController{
     }
 
   }
-  Future onSelectNotification(dynamic payload) async {
-    print('onSelectNotification ${payload.toString()}');
+  Future _onSelectNotification(dynamic payload) async {
     if (payload != null) {
-      print('notification payload:::::: ${payload.toString()}' );
-      await  handlePayload(payload);
+      print('notification payload111:::::: ${payload.toString()}');
+      await handlePayload(payload);
     }
   }
+
   Future onSelectNotification_(NotificationResponse payload) async {
-    print('onSelectNotification ${payload.payload}');
+    print('onSelectNotification 1 ${payload.payload}');
     if (payload != null) {
-      print('notification payload:::::: ${payload.payload}' );
+      print('notification payload:::::: 1  ${payload.payload}' );
       await  handlePayload(payload.payload.toString());
+    }
+  }
+  // todo cách 2 xử lý payload
+  Future _onDidReceiveNotificationResponse(NotificationResponse payload) async {
+    if (payload != null) {
+      //  print('notification payload:::::: ${payload.toString()}');
+      //selectNotificationSubject.add(payload);
+      await handlePayload(payload.payload.toString());
     }
   }
   handlePayload(String payload) async {
   //  print('payload $payload');
     DataNotifyModel data=  DataNotifyModel.fromPyload(payload);
+    gotoDetailScreen(data);
+  }
+  _getDataDetail(RemoteMessage remoteMessage){
+    DataNotifyModel data = DataNotifyModel.fromRemoteMessage(remoteMessage);
     gotoDetailScreen(data);
   }
   gotoDetailScreen(DataNotifyModel dataModel){
